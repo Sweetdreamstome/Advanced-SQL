@@ -229,3 +229,43 @@ AND (V.Vaccine <> 'Rabies' OR V.Vaccine IS NULL)
 GROUP BY A.Species, A.Name
 HAVING MAX(V.Vaccination_Time) < '20191001' OR MAX(V.Vaccination_Time) IS NULL
 ORDER BY A.Species, A.Name
+
+
+--10
+SELECT *
+FROM Animals
+ORDER BY 2,5,1;
+--or
+SELECT *
+FROM Animals
+ORDER BY Species, Breed, Name;
+--which the second one is better
+
+--11
+SELECT 
+Adoption_Date, Species, Name
+FROM 
+Adoptions
+ORDER BY
+Adoption_Date DESC;
+
+SELECT Species, Name
+FROM 
+Adoptions
+ORDER BY
+Adoption_Date DESC;
+
+SELECT * --Adoption_Date, Species, Name
+FROM Animals
+ORDER BY Species, Name;
+
+--12
+SELECT TOP(3) *
+FROM Animals;
+--is not very useful, no guarantee which 3 rows will be return
+
+SELECT *
+FROM Animals
+ORDER BY Admission_Date DESC
+OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
+
