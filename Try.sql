@@ -212,14 +212,20 @@ ORDER BY Number_Of_Adoptions DESC;
 
 --9
 --vaccinations, animals
-SELECT
-A.Name,
+SELECT 
 A.Species,
-A.Primary_Color,
-A.Breed,
-V.Vaccine
+A.Name,
+MAX(A.Primary_Color) AS Primary_Color,
+MAX(A.Breed) AS Breed,
+COUNT(V.Vaccine) AS Num_Vaccinations
+--V.Vaccination_Time
 FROM Animals AS A 
-LEFT OUTER JOIN Vaccinations AS V
-ON A.Name = V.Name AND A.Species = V.Species
-GROUP BY A.Name, A.Species
-
+LEFT JOIN 
+  Vaccinations AS V
+ON V.Name = A.Name AND V.Species = A.Species
+WHERE A.Species <> 'Rabbit'
+AND (V.Vaccine <> 'Rabies' OR V.Vaccine IS NULL)
+--AND V.Vaccination_Time > '2019-10-01 00:00:00.000'
+GROUP BY A.Species, A.Name
+HAVING MAX(V.Vaccination_Time) < '20191001' OR MAX(V.Vaccination_Time) IS NULL
+ORDER BY A.Species, A.Name
