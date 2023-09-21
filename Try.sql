@@ -269,3 +269,44 @@ FROM Animals
 ORDER BY Admission_Date DESC
 OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
 
+
+--PARTE 2
+--1
+--show adoption rows including fees. MAX fee ever paid. 
+--Discount from MAX in percent
+SELECT MAX(Adoption_Fee)
+FROM Adoptions;
+
+SELECT *, (SELECT MAX(Adoption_Fee) FROM Adoptions),
+  (((SELECT MAX(Adoption_Fee) FROM Adoptions) - Adoption_Fee) * 100)/(SELECT MAX(Adoption_Fee) FROM Adoptions) AS Discount_Percent
+FROM Adoptions;
+
+--MAX fee per species 
+SELECT *,
+  ( SELECT MAX(Adoption_Fee)
+  FROM Adoptions AS A2
+  WHERE A2.Species = A1.Species
+  ) AS Max_Fee
+FROM Adoptions AS A1
+--at runtime: A1 species will be replaces with the species from the
+--outer row, and the max from A2 will be picked among the rows only
+--for that same species in the second instance of the table A1.
+
+--show all attributes for people that adopted at least one animal
+SELECT DISTINCT P.*
+FROM Persons AS P
+INNER JOIN
+Adoptions AS A
+ON A.Adopter_Email = P.Email;
+--other way to do it:
+SELECT *
+FROM Persons
+WHERE Email IN (SELECT Adopter_Email FROM Adoptions);
+--other way with EXIST
+SELECT *
+FROM Persons AS P
+WHERE EXISTS (
+  SELECT NULL
+  FROM Adoptions AS A
+  WHERE A.Adopter_Email = P.Email
+  );
