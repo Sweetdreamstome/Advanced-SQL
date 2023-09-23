@@ -310,3 +310,53 @@ WHERE EXISTS (
   FROM Adoptions AS A
   WHERE A.Adopter_Email = P.Email
   );
+
+
+--2
+--Animals not adopted
+--one way:
+SELECT DISTINCT
+AN.Name, AN.Species
+FROM Animals AS AN
+LEFT OUTER JOIN
+  Adoptions AS AD
+ON AD.Name = AN.Name AND AD.Species = AN.Species
+WHERE AD.Name IS NULL;
+--another way:
+SELECT Name, Species
+FROM Animals AS AN
+WHERE NOT EXISTS(
+  SELECT NULL
+  FROM Adoptions AS AD
+  WHERE AD.Name = AN.Name AND AD.Species = AN.Species
+  );
+--set operator: SQL AT ITS BEST! SIMPLE CONCISE EFFICIENT
+SELECT Name, Species
+FROM Animals 
+EXCEPT
+SELECT Name, Species
+FROM Adoptions 
+
+--3
+SELECT DISTINCT
+AN.Breed 
+FROM Animals AS AN
+LEFT OUTER JOIN
+  Adoptions AS AD
+ON AD.Name = AN.Name AND AD.Species = AN.Species
+WHERE AD.Name IS NULL AND AN.Breed IS NOT NULL;
+
+--a better way:
+SELECT Species, Breed
+FROM Animals
+EXCEPT
+SELECT AN.Species, AN.Breed
+FROM Animals AS AN
+INNER JOIN
+Adoptions AS AD
+ON AN.Species = AD.Species
+AND
+AN.Name = AD.Name;
+--compare it with the join table!! easy peasy
+
+ 
