@@ -360,3 +360,56 @@ AN.Name = AD.Name;
 --compare it with the join table!! easy peasy
 
  
+--4
+SELECT A1.Adopter_Email, A1.Adoption_Date,
+A1.Name AS Name1, A1.Species AS Species1,
+A2.Name AS Name2, A2.Species AS Species2
+FROM Adoptions AS A1
+INNER JOIN
+Adoptions AS A2
+ON A1.Adopter_Email = A2.Adopter_Email
+AND
+A1.Adoption_Date = A2.Adoption_Date
+  AND
+  ((A1.Name = A2.Name AND A1.Species > A2.Species)
+  OR
+  (A1.Name > A2.Name AND A1.Species = A2.Species)
+  OR
+  (A1.Name > A2.Name AND A1.Species <> A2.Species))
+ORDER BY A1.Adopter_Email, A1.Adoption_Date
+--en vez de poner <> ponemos < o > para los nombres solamente
+--ASEGURARTE PARA QUE SALGAN CON 2 KEYS INCLUIDOS
+
+--5
+--animals and recent vaccine
+SELECT A.Name, A.Species, A.Primary_Color, A.Breed,
+( SELECT Vaccine
+  FROM Vaccinations AS V
+  WHERE V.Name = A.Name
+  AND V.Species = A.Species
+  ORDER BY V.Vaccination_Time DESC
+  OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY
+  ) AS Last_Vaccine
+  FROM Animals AS A;
+--this is limited and inefficient:
+--it returns a null expression
+
+--if we want to return the last vaccine time you have to create
+--a new subquery which is inneficient
+SELECT A.Name, A.Species, A.Primary_Color, A.Breed,
+( SELECT Vaccine
+  FROM Vaccinations AS V
+  WHERE V.Name = A.Name
+  AND V.Species = A.Species
+  ORDER BY V.Vaccination_Time DESC
+  OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY
+  ) AS Last_Vaccine,
+  ( SELECT V.Vaccination_Time
+  FROM Vaccinations AS V
+  WHERE V.Name = A.Name
+  AND V.Species = A.Species
+  ORDER BY V.Vaccination_Time DESC
+  OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY
+  ) AS Last_Vaccine_Time
+  FROM Animals AS A;
+
